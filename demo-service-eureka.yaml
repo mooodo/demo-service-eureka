@@ -1,0 +1,39 @@
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  labels:
+    app: demo-service-eureka
+  name: demo-service-eureka 
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-service-eureka
+  template:
+    metadata:
+      name: demo-service-eureka
+      labels:
+        app: demo-service-eureka
+    spec:
+      containers:
+      - name: demo-service-eureka
+        image: repository:5000/demo-service-eureka
+        imagePullPolicy: Always
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: demo-service-eureka
+  name: demo-service-eureka
+  namespace: default
+spec:
+  type: NodePort
+  ports:
+  - port: 9001 
+    targetPort: 9001
+    nodePort: 31001
+  selector:
+    app: demo-service-eureka

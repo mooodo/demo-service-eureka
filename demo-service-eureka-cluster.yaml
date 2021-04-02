@@ -1,0 +1,68 @@
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  labels:
+    app: demo-service-eureka-cluster
+  name: eureka
+  namespace: default
+spec:
+  replicas: 3
+  serviceName: eureka
+  podManagementPolicy: "Parallel"
+  selector:
+    matchLabels:
+      app: demo-service-eureka-cluster
+  template:
+    metadata:
+      name: eureka
+      labels:
+        app: demo-service-eureka-cluster
+    spec:
+      containers:
+      - name: demo-service-eureka-cluster
+        image: repository:5000/demo-service-eureka
+        imagePullPolicy: Always
+        args: [--spring.profiles.active=cluster]
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: SERVICE_HOST
+          value: ${POD_NAME}.eureka
+        - name: REGISTRY_URL
+          value: "http://eureka-0.eureka:9001/eureka,http://eureka-1.eureka:9001/eureka,http://eureka-2.eureka:9001/eureka"
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: demo-service-eureka-cluster
+  name: eureka
+  namespace: default
+spec:
+  ports:
+  - name: http 
+    port: 9001
+  clusterIP: None
+  selector:
+    app: demo-service-eureka-cluster
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: demo-service-eureka-cluster
+  name: demo-service-eureka-cluster
+  namespace: default
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    port: 9001 
+    targetPort: 9001
+    nodePort: 32001
+  selector:
+    app: demo-service-eureka-cluster

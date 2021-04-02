@@ -1,0 +1,98 @@
+spring:
+  application:
+    name: service-registry
+  profiles.active: dev
+---
+server:
+  port: 9001
+spring:
+  profiles: dev
+eureka:
+  environment: dev
+  instance:
+    hostname: localhost
+    port: ${server.port}
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+
+---
+spring:
+  profiles: docker
+server:
+  port: ${SERVICE_PORT:9001}
+eureka:
+  environment: docker
+  instance:
+    hostname: ${SERVICE_HOST:localhost}
+    port: ${server.port}
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+  server:
+    enable-self-preservation: true
+    eviction-interval-timer-in-ms: 5000 #default 60000
+    
+---
+
+spring:
+  profiles: cluster
+server:
+  port: ${SERVICE_PORT:9001}
+eureka:
+  environment: cluster
+  instance:
+    hostname: ${SERVICE_HOST:localhost}
+    port: ${server.port}
+  client:
+    serviceUrl:
+      defaultZone: ${REGISTRY_URL:http://${eureka.instance.hostname}:${server.port}/eureka/}
+  server:
+    enable-self-preservation: true
+    eviction-interval-timer-in-ms: 5000 #default 60000
+
+---
+
+spring:
+  profiles: primary
+server:
+  port: 32001
+eureka:
+  instance:
+    hostname: eureka-primary
+    port: ${server.port}
+  client:
+    serviceUrl:
+      defaultZone: http://eureka-secondary:32002/eureka/,http://eureka-tertiary:32003/eureka/
+
+---
+spring:
+  profiles: secondary
+server:
+  port: 32002
+eureka:
+  instance:
+    hostname: eureka-secondary
+    port: ${server.port}
+  client:
+    serviceUrl:
+      defaultZone: http://eureka-primary:32001/eureka/,http://eureka-tertiary:32003/eureka/
+
+
+---
+
+spring:
+  profiles: tertiary
+server:
+  port: 32003
+eureka:
+  instance:
+    hostname: eureka-tertiary
+    port: ${server.port}
+  client:
+    serviceUrl:
+      defaultZone: http://eureka-secondary:32002/eureka/,http://eureka-primary:32001/eureka/
