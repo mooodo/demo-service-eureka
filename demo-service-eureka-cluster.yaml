@@ -18,6 +18,16 @@ spec:
       labels:
         app: demo-service-eureka-cluster
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                      - demo-service-eureka-cluster
+              topologyKey: "kubernetes.io/hostname"
       containers:
       - name: demo-service-eureka-cluster
         image: repository:5000/demo-service-eureka
