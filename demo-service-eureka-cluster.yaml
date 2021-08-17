@@ -30,7 +30,7 @@ spec:
               topologyKey: "kubernetes.io/hostname"
       containers:
       - name: demo-service-eureka-cluster
-        image: repository:5000/demo-service-eureka
+        image: repository:5000/demo-service-eureka:<VERSION>
         imagePullPolicy: Always
         args: [--spring.profiles.active=cluster]
         env:
