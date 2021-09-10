@@ -1,5 +1,5 @@
 # demo-service-eureka
-这是一个项目用于演示微服务的注册中心eureka
+这是一个项目用于演示微服务的注册中心eureka。
 该项目演示了如下内容：
 ### 多套环境配置
 在bootstrap.yml文件中编写了多套环境配置：
